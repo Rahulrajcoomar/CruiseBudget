@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSC Cruise Budget & Task Planner</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-primary-active: var(--color-teal-700);
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-error: var(--color-red-400);
+            --color-success: var(--color-teal-500);
+            --color-warning: var(--color-orange-500);
+            
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --space-4: 4px;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(167, 169, 169, 0.7);
+                --color-primary: rgba(50, 184, 198, 1);
+                --color-primary-hover: rgba(45, 166, 178, 1);
+                --color-border: rgba(119, 124, 124, 0.3);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            font-family: var(--font-family-base);
+            line-height: 1.5;
+            color: var(--color-text);
+            background-color: var(--color-background);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: var(--space-16);
+            background-color: var(--color-background);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: var(--space-24);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: var(--space-8);
+        }
+
+        .subtitle {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-20);
+            margin-bottom: var(--space-24);
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+            padding: var(--space-20);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-16);
+            margin-bottom: var(--space-24);
+        }
+
+        .summary-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+            padding: var(--space-16);
+            text-align: center;
+        }
+
+        .summary-label {
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: var(--space-8);
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: var(--space-16);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-16);
+        }
+
+        label {
+            display: block;
+            margin-bottom: var(--space-8);
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--color-text);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: var(--space-8) var(--space-12);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--color-background);
+            color: var(--color-text);
+            transition: border-color 200ms ease;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(33, 128, 141, 0.1);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-12);
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn {
+            padding: var(--space-8) var(--space-16);
+            border: none;
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 200ms ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-8);
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+            width: 100%;
+            padding: var(--space-12) var(--space-16);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-primary:active {
+            background: var(--color-primary-active);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+            padding: var(--space-8) var(--space-12);
+            font-size: 13px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(33, 128, 141, 0.1);
+        }
+
+        .btn-danger {
+            background: var(--color-error);
+            color: white;
+            padding: var(--space-8) var(--space-12);
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+
+        .budget-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--space-16);
+        }
+
+        .budget-table th {
+            background: var(--color-background);
+            padding: var(--space-12);
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            border-bottom: 2px solid var(--color-border);
+            text-transform: uppercase;
+        }
+
+        .budget-table td {
+            padding: var(--space-12);
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+        }
+
+        .budget-table tr:last-child td {
+            border-bottom: 2px solid var(--color-border);
+            font-weight: 600;
+            background: rgba(33, 128, 141, 0.05);
+        }
+
+        .category-name {
+            color: var(--color-text);
+            font-weight: 500;
+        }
+
+        .category-type {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+        }
+
+        .amount {
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .amount.essential {
+            color: var(--color-error);
+        }
+
+        .actions {
+            display: flex;
+            gap: var(--space-8);
+            justify-content: flex-end;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-24);
+            color: var(--color-text-secondary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--color-border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: var(--space-8);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--color-success);
+            border-radius: 4px;
+            transition: width 300ms ease;
+        }
+
+        .progress-fill.warning {
+            background: var(--color-warning);
+        }
+
+        .progress-fill.danger {
+            background: var(--color-error);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: var(--space-4) var(--space-8);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-essential {
+            background: rgba(255, 84, 89, 0.15);
+            color: var(--color-error);
+        }
+
+        .badge-optional {
+            background: rgba(168, 75, 47, 0.15);
+            color: var(--color-warning);
+        }
+
+        .badge-lifegivers {
+            background: rgba(33, 128, 141, 0.15);
+            color: var(--color-primary);
+        }
+
+        .info-box {
+            background: rgba(33, 128, 141, 0.1);
+            border-left: 3px solid var(--color-primary);
+            padding: var(--space-12);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-16);
+            font-size: 13px;
+            color: var(--color-text);
+        }
+
+        .info-box strong {
+            color: var(--color-primary);
+        }
+
+        .tabs {
+            display: flex;
+            gap: var(--space-8);
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: var(--space-16);
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: var(--space-12) var(--space-16);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            border-bottom: 2px solid transparent;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 200ms ease;
+        }
+
+        .tab-button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-button:hover {
+            color: var(--color-text);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-12);
+            padding: var(--space-12);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-8);
+            background: var(--color-background);
+            transition: all 200ms ease;
+        }
+
+        .task-item:hover {
+            border-color: var(--color-primary);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: var(--color-text-secondary);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-text {
+            font-weight: 500;
+            color: var(--color-text);
+            margin-bottom: var(--space-4);
+        }
+
+        .task-notes {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: var(--space-8);
+            flex-shrink: 0;
+        }
+
+        .section-nav {
+            display: flex;
+            gap: var(--space-12);
+            margin-bottom: var(--space-24);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .section-nav button {
+            padding: var(--space-12) var(--space-24);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            color: var(--color-text);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 200ms ease;
+        }
+
+        .section-nav button:hover {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✈️ MSC Cruise Planner</h1>
+            <p class="subtitle">Marseille 22-29 June 2026 | Budget & Tasks</p>
+        </header>
+
+        <div class="section-nav">
+            <button onclick="showSection('budget')">💰 Budget</button>
+            <button onclick="showSection('tasks')">✓ Tasks</button>
+        </div>
+
+        <div id="budgetSection" class="section active">
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-label">Total Budget</div>
+                    <div class="summary-value" id="totalBudget">R0.00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Essential Costs</div>
+                    <div class="summary-value" id="essentialCosts">R0.00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Optional Costs</div>
+                    <div class="summary-value" id="optionalCosts">R0.00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Lifegivers Costs</div>
+                    <div class="summary-value" id="lifegiversCosts">R0.00</div>
+                </div>
+            </div>
+
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-label">Total Per Person (÷4)</div>
+                    <div class="summary-value" id="totalPerPerson">R0.00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Essential Per Person (÷4)</div>
+                    <div class="summary-value" id="essentialPerPerson">R0.00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Optional Per Person (÷4)</div>
+                    <div class="summary-value" id="optionalPerPerson">R0.00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Lifegivers Per Person (÷2)</div>
+                    <div class="summary-value" id="lifegiverPerPerson">R0.00</div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <h2>Add Budget Item</h2>
+                    <form id="budgetForm">
+                        <div class="form-group">
+                            <label for="itemName">Item Name</label>
+                            <input type="text" id="itemName" placeholder="e.g., MSC Cruise Package" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="itemCost">Cost per Unit (ZAR)</label>
+                                <input type="number" id="itemCost" placeholder="0.00" min="0" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="itemQuantity">Quantity</label>
+                                <input type="number" id="itemQuantity" placeholder="1" min="1" step="1" value="1" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="itemCategory">Type</label>
+                                <select id="itemCategory" required>
+                                    <option value="Essential">Essential</option>
+                                    <option value="Optional">Optional</option>
+                                    <option value="Lifegivers">Lifegivers</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label style="color: var(--color-text-secondary); font-weight: 600;">Total Cost</label>
+                                <div style="padding: var(--space-8) var(--space-12); background: var(--color-background); border-radius: var(--radius-base); border: 1px solid var(--color-border); font-size: 14px; color: var(--color-primary); font-weight: 600;">
+                                    R<span id="totalCostDisplay">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="itemDescription">Description (Optional)</label>
+                            <input type="text" id="itemDescription" placeholder="Add notes about this expense">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="submitBtn">+ Add Item</button>
+                        <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display: none; margin-top: var(--space-8);">Cancel Edit</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Budget Summary</h2>
+                    <div class="info-box">
+                        For 4 people traveling 22-29 June 2026
+                    </div>
+
+                    <div style="margin-bottom: var(--space-16);">
+                        <label style="display: flex; align-items: center; gap: var(--space-8); margin-bottom: var(--space-8);">
+                            <span style="font-weight: 600;">Budget Breakdown</span>
+                        </label>
+                        <div style="font-size: 13px; color: var(--color-text-secondary);">
+                            <div style="display: flex; justify-content: space-between; padding: var(--space-8) 0; border-bottom: 1px solid var(--color-border);">
+                                <span>Essential:</span>
+                                <strong id="essentialDisplay">R0.00</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: var(--space-8) 0; border-bottom: 1px solid var(--color-border);">
+                                <span>Optional:</span>
+                                <strong id="optionalDisplay">R0.00</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: var(--space-8) 0;">
+                                <span>Lifegivers:</span>
+                                <strong id="lifegiverDisplay">R0.00</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="font-weight: 600; margin-bottom: var(--space-8); display: block;">Budget Health</label>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: var(--space-8);">
+                            <span id="budgetStatus">No items added yet</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: var(--space-16); display: flex; flex-direction: column; gap: var(--space-8);">
+                        <button class="btn btn-secondary" onclick="exportToCSV()" style="width: 100%;">📊 Export as CSV</button>
+                        <label for="csvFileInput" class="btn btn-secondary" style="width: 100%; margin: 0; cursor: pointer;">
+                            📁 Import CSV
+                            <input type="file" id="csvFileInput" accept=".csv" style="display: none;" onchange="importCSV(event)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="tabs">
+                    <button class="tab-button active" onclick="switchTab('all')">All Items</button>
+                    <button class="tab-button" onclick="switchTab('essential')">Essential</button>
+                    <button class="tab-button" onclick="switchTab('optional')">Optional</button>
+                    <button class="tab-button" onclick="switchTab('lifegivers')">Lifegivers</button>
+                </div>
+
+                <div id="all" class="tab-content active">
+                    <h2>Budget Items</h2>
+                    <div id="budgetList"></div>
+                </div>
+
+                <div id="essential" class="tab-content">
+                    <h2>Essential Costs</h2>
+                    <div id="essentialList"></div>
+                </div>
+
+                <div id="optional" class="tab-content">
+                    <h2>Optional Costs</h2>
+                    <div id="optionalList"></div>
+                </div>
+
+                <div id="lifegivers" class="tab-content">
+                    <h2>Lifegivers Costs</h2>
+                    <div id="lifegiversList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tasksSection" class="section">
+            <div class="grid">
+                <div class="card">
+                    <h2>Add New Task</h2>
+                    <form id="taskForm">
+                        <div class="form-group">
+                            <label for="taskTitle">Task Name</label>
+                            <input type="text" id="taskTitle" placeholder="e.g., Apply for Schengen visa" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="taskNotes">Notes (Optional)</label>
+                            <textarea id="taskNotes" placeholder="Add details, deadlines, or reminders..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="taskSubmitBtn">+ Add Task</button>
+                        <button type="button" class="btn btn-secondary" id="taskCancelBtn" style="display: none; margin-top: var(--space-8);">Cancel Edit</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Task Progress</h2>
+                    <div style="margin-bottom: var(--space-16);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-8);">
+                            <span style="font-weight: 600;">Completed</span>
+                            <span id="taskProgress" style="font-weight: 600; color: var(--color-primary);">0 / 0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="taskProgressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        ✓ Check off tasks as you complete them. Tasks are saved automatically!
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="tabs">
+                    <button class="tab-button active" onclick="switchTaskTab('allTasks')">All Tasks</button>
+                    <button class="tab-button" onclick="switchTaskTab('activeTasks')">Active</button>
+                    <button class="tab-button" onclick="switchTaskTab('completedTasks')">Completed</button>
+                </div>
+
+                <div id="allTasks" class="tab-content active">
+                    <div id="taskList"></div>
+                </div>
+
+                <div id="activeTasks" class="tab-content">
+                    <div id="activeTaskList"></div>
+                </div>
+
+                <div id="completedTasks" class="tab-content">
+                    <div id="completedTaskList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let budgetItems = [];
+        let tasks = [];
+        let editingBudgetId = null;
+        let editingTaskId = null;
+
+        function initializeApp() {
+            const savedBudget = localStorage.getItem('mscBudget');
+            const savedTasks = localStorage.getItem('mscTasks');
+
+            if (savedBudget) {
+                budgetItems = JSON.parse(savedBudget);
+            }
+
+            if (savedTasks) {
+                tasks = JSON.parse(savedTasks);
+            }
+
+            renderBudget();
+            updateSummary();
+            renderTasks();
+            updateTaskProgress();
+        }
+
+        function saveBudget() {
+            localStorage.setItem('mscBudget', JSON.stringify(budgetItems));
+        }
+
+        function saveTasks() {
+            localStorage.setItem('mscTasks', JSON.stringify(tasks));
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            if (section === 'budget') {
+                document.getElementById('budgetSection').classList.add('active');
+            } else if (section === 'tasks') {
+                document.getElementById('tasksSection').classList.add('active');
+            }
+        }
+
+        document.getElementById('itemCost').addEventListener('input', updateFormTotal);
+        document.getElementById('itemQuantity').addEventListener('input', updateFormTotal);
+
+        function updateFormTotal() {
+            const cost = parseFloat(document.getElementById('itemCost').value) || 0;
+            const quantity = parseInt(document.getElementById('itemQuantity').value) || 1;
+            const total = cost * quantity;
+            document.getElementById('totalCostDisplay').textContent = total.toFixed(2);
+        }
+
+        document.getElementById('budgetForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('itemName').value.trim();
+            const cost = parseFloat(document.getElementById('itemCost').value);
+            const quantity = parseInt(document.getElementById('itemQuantity').value);
+            const category = document.getElementById('itemCategory').value;
+            const description = document.getElementById('itemDescription').value.trim();
+
+            if (!name || isNaN(cost) || cost <= 0 || isNaN(quantity) || quantity <= 0) {
+                alert('Please enter valid item name, cost, and quantity');
+                return;
+            }
+
+            if (editingBudgetId) {
+                budgetItems = budgetItems.map(item =>
+                    item.id === editingBudgetId
+                        ? { ...item, name, cost, quantity, category, description }
+                        : item
+                );
+                editingBudgetId = null;
+                document.getElementById('submitBtn').textContent = '+ Add Item';
+                document.getElementById('cancelEditBtn').style.display = 'none';
+            } else {
+                const newItem = {
+                    id: Date.now() + Math.random(),
+                    name,
+                    cost,
+                    quantity,
+                    category,
+                    description
+                };
+                budgetItems.push(newItem);
+            }
+
+            saveBudget();
+            renderBudget();
+            updateSummary();
+
+            this.reset();
+            document.getElementById('itemQuantity').value = '1';
+            updateFormTotal();
+        });
+
+        document.getElementById('cancelEditBtn').addEventListener('click', function() {
+            editingBudgetId = null;
+            document.getElementById('budgetForm').reset();
+            document.getElementById('itemQuantity').value = '1';
+            document.getElementById('submitBtn').textContent = '+ Add Item';
+            this.style.display = 'none';
+            updateFormTotal();
+        });
+
+        function editBudgetItem(id) {
+            const item = budgetItems.find(i => i.id === id);
+            if (!item) return;
+
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemCost').value = item.cost;
+            document.getElementById('itemQuantity').value = item.quantity;
+            document.getElementById('itemCategory').value = item.category;
+            document.getElementById('itemDescription').value = item.description;
+
+            document.getElementById('submitBtn').textContent = '✓ Update Item';
+            document.getElementById('cancelEditBtn').style.display = 'block';
+
+            editingBudgetId = id;
+            updateFormTotal();
+            showSection('budget');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteBudgetItem(id) {
+            if (confirm('Delete this item?')) {
+                budgetItems = budgetItems.filter(item => item.id !== id);
+                saveBudget();
+                renderBudget();
+                updateSummary();
+            }
+        }
+
+        function renderBudget() {
+            const allList = document.getElementById('budgetList');
+            const essentialList = document.getElementById('essentialList');
+            const optionalList = document.getElementById('optionalList');
+            const lifegiversList = document.getElementById('lifegiversList');
+
+            if (budgetItems.length === 0) {
+                const emptyMsg = '<div class="empty-state"><p>No budget items yet. Add your first expense above!</p></div>';
+                allList.innerHTML = emptyMsg;
+                essentialList.innerHTML = emptyMsg;
+                optionalList.innerHTML = emptyMsg;
+                lifegiversList.innerHTML = emptyMsg;
+                return;
+            }
+
+            const renderList = (items) => {
+                if (items.length === 0) return '<div class="empty-state"><p>No items in this category</p></div>';
+
+                let html = '<table class="budget-table"><thead><tr><th>Item</th><th>Cost</th><th>Type</th><th>Action</th></tr></thead><tbody>';
+
+                let subtotal = 0;
+                items.forEach(item => {
+                    subtotal += item.cost * item.quantity;
+                    let badge = '<span class="badge badge-optional">Optional</span>';
+                    if (item.category === 'Essential') {
+                        badge = '<span class="badge badge-essential">Essential</span>';
+                    } else if (item.category === 'Lifegivers') {
+                        badge = '<span class="badge badge-lifegivers">Lifegivers</span>';
+                    }
+                    html += `
+                        <tr>
+                            <td>
+                                <div class="category-name">${escapeHtml(item.name)}</div>
+                                <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: var(--space-4);">
+                                    ${item.quantity > 1 ? `${item.quantity}x R${item.cost.toFixed(2)} = ` : ''}R${(item.cost * item.quantity).toFixed(2)}
+                                </div>
+                                ${item.description ? '<div class="category-type">' + escapeHtml(item.description) + '</div>' : ''}
+                            </td>
+                            <td class="amount">R${(item.cost * item.quantity).toFixed(2)}</td>
+                            <td>${badge}</td>
+                            <td class="actions">
+                                <button class="btn btn-secondary" onclick="editBudgetItem(${item.id})" style="padding: var(--space-8) var(--space-12); font-size: 12px;">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteBudgetItem(${item.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                    <tr>
+                        <td class="category-name" style="font-weight: 700;">Subtotal</td>
+                        <td class="amount" style="font-weight: 700;">R${subtotal.toFixed(2)}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody></table>`;
+
+                return html;
+            };
+
+            allList.innerHTML = renderList(budgetItems);
+            essentialList.innerHTML = renderList(budgetItems.filter(item => item.category === 'Essential'));
+            optionalList.innerHTML = renderList(budgetItems.filter(item => item.category === 'Optional'));
+            lifegiversList.innerHTML = renderList(budgetItems.filter(item => item.category === 'Lifegivers'));
+        }
+
+        function updateSummary() {
+            const essentialItems = budgetItems.filter(item => item.category === 'Essential');
+            const optionalItems = budgetItems.filter(item => item.category === 'Optional');
+            const lifegiverItems = budgetItems.filter(item => item.category === 'Lifegivers');
+
+            const essentialTotal = essentialItems.reduce((sum, item) => sum + (item.cost * item.quantity), 0);
+            const optionalTotal = optionalItems.reduce((sum, item) => sum + (item.cost * item.quantity), 0);
+            const lifegiverTotal = lifegiverItems.reduce((sum, item) => sum + (item.cost * item.quantity), 0);
+            const grandTotal = essentialTotal + optionalTotal + lifegiverTotal;
+
+            const totalPerPerson = grandTotal / 4;
+            const essentialPerPerson = essentialTotal / 4;
+            const optionalPerPerson = optionalTotal / 4;
+            const lifegiverPerPerson = lifegiverTotal / 2;
+
+            document.getElementById('totalBudget').textContent = 'R' + grandTotal.toFixed(2);
+            document.getElementById('essentialCosts').textContent = 'R' + essentialTotal.toFixed(2);
+            document.getElementById('optionalCosts').textContent = 'R' + optionalTotal.toFixed(2);
+            document.getElementById('lifegiversCosts').textContent = 'R' + lifegiverTotal.toFixed(2);
+
+            document.getElementById('totalPerPerson').textContent = 'R' + totalPerPerson.toFixed(2);
+            document.getElementById('essentialPerPerson').textContent = 'R' + essentialPerPerson.toFixed(2);
+            document.getElementById('optionalPerPerson').textContent = 'R' + optionalPerPerson.toFixed(2);
+            document.getElementById('lifegiverPerPerson').textContent = 'R' + lifegiverPerPerson.toFixed(2);
+
+            document.getElementById('essentialDisplay').textContent = 'R' + essentialTotal.toFixed(2);
+            document.getElementById('optionalDisplay').textContent = 'R' + optionalTotal.toFixed(2);
+            document.getElementById('lifegiverDisplay').textContent = 'R' + lifegiverTotal.toFixed(2);
+
+            const budgetTarget = 95000;
+            const percentage = Math.min((grandTotal / budgetTarget) * 100, 100);
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percentage + '%';
+
+            let statusClass = 'success';
+            let statusText = `You're tracking well! R${grandTotal.toFixed(2)} / R${budgetTarget.toFixed(2)}`;
+
+            if (percentage > 90) {
+                statusClass = 'danger';
+                statusText = '⚠️ Budget approaching limit!';
+            } else if (percentage > 70) {
+                statusClass = 'warning';
+                statusText = '✓ Budget on track';
+            }
+
+            progressBar.className = 'progress-fill ' + statusClass;
+            document.getElementById('budgetStatus').textContent = statusText;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('#budgetSection .tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('#budgetSection .tab-button').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function exportToCSV() {
+            const headers = ['Item', 'Quantity', 'Unit Cost (ZAR)', 'Total Cost (ZAR)', 'Category', 'Description'];
+            const rows = budgetItems.map(item => [
+                item.name,
+                item.quantity,
+                item.cost,
+                item.cost * item.quantity,
+                item.category,
+                item.description || ''
+            ]);
+
+            const essentialTotal = budgetItems.filter(item => item.category === 'Essential').reduce((sum, item) => sum + (item.cost * item.quantity), 0);
+            const optionalTotal = budgetItems.filter(item => item.category === 'Optional').reduce((sum, item) => sum + (item.cost * item.quantity), 0);
+            const lifegiverTotal = budgetItems.filter(item => item.category === 'Lifegivers').reduce((sum, item) => sum + (item.cost * item.quantity), 0);
+            const grandTotal = essentialTotal + optionalTotal + lifegiverTotal;
+
+            rows.push([]);
+            rows.push(['Essential Total', '', '', essentialTotal, '', '']);
+            rows.push(['Optional Total', '', '', optionalTotal, '', '']);
+            rows.push(['Lifegivers Total', '', '', lifegiverTotal, '', '']);
+            rows.push(['Grand Total', '', '', grandTotal, '', '']);
+            rows.push(['Total Per Person (÷4)', '', '', (grandTotal / 4).toFixed(2), '', '']);
+            rows.push(['Essential Per Person (÷4)', '', '', (essentialTotal / 4).toFixed(2), '', '']);
+            rows.push(['Optional Per Person (÷4)', '', '', (optionalTotal / 4).toFixed(2), '', '']);
+            rows.push(['Lifegivers Per Person (÷2)', '', '', (lifegiverTotal / 2).toFixed(2), '', '']);
+
+            const csvContent = [headers, ...rows]
+                .map(row => row.map(cell => `"${cell}"`).join(','))
+                .join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'MSC_Cruise_Budget_' + new Date().toISOString().split('T')[0] + '.csv';
+            link.click();
+        }
+
+        function importCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n').filter(line => line.trim());
+
+                if (lines.length < 2) {
+                    alert('Invalid CSV file format');
+                    return;
+                }
+
+                const newItems = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+
+                    if (!line ||
+                        line.includes('Essential Total') ||
+                        line.includes('Optional Total') ||
+                        line.includes('Lifegivers Total') ||
+                        line.includes('Grand Total') ||
+                        line.includes('Per Person')) {
+                        continue;
+                    }
+
+                    const cells = line.match(/("([^"]*)"|[^,]+)/g);
+                    if (!cells || cells.length < 6) continue;
+
+                    const unquote = v => v.replace(/^"(.*)"$/, '$1');
+
+                    const name = unquote(cells[0]);
+                    const quantity = parseInt(unquote(cells[1])) || 1;
+                    const cost = parseFloat(unquote(cells[2])) || 0;
+                    const category = unquote(cells[4]) || 'Optional';
+                    const description = unquote(cells[5]) || '';
+
+                    if (name && cost > 0) {
+                        newItems.push({
+                            id: Date.now() + Math.random(),
+                            name,
+                            cost,
+                            quantity,
+                            category,
+                            description
+                        });
+                    }
+                }
+
+                if (newItems.length > 0) {
+                    if (confirm(`Import ${newItems.length} items? This will replace all existing data.`)) {
+                        budgetItems = newItems;
+                        saveBudget();
+                        renderBudget();
+                        updateSummary();
+                        alert(`Successfully imported ${newItems.length} items!`);
+                    }
+                } else {
+                    alert('No valid items found in CSV file');
+                }
+
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
+        }
+
+        document.getElementById('taskForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('taskTitle').value.trim();
+            const notes = document.getElementById('taskNotes').value.trim();
+
+            if (!title) {
+                alert('Please enter a task name');
+                return;
+            }
+
+            if (editingTaskId) {
+                tasks = tasks.map(task =>
+                    task.id === editingTaskId
+                        ? { ...task, title, notes }
+                        : task
+                );
+                editingTaskId = null;
+                document.getElementById('taskSubmitBtn').textContent = '+ Add Task';
+                document.getElementById('taskCancelBtn').style.display = 'none';
+            } else {
+                const newTask = {
+                    id: Date.now() + Math.random(),
+                    title,
+                    notes,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+                tasks.push(newTask);
+            }
+
+            saveTasks();
+            renderTasks();
+            updateTaskProgress();
+
+            this.reset();
+        });
+
+        document.getElementById('taskCancelBtn').addEventListener('click', function() {
+            editingTaskId = null;
+            document.getElementById('taskForm').reset();
+            document.getElementById('taskSubmitBtn').textContent = '+ Add Task';
+            this.style.display = 'none';
+        });
+
+        function toggleTask(id) {
+            tasks = tasks.map(task =>
+                task.id === id
+                    ? { ...task, completed: !task.completed }
+                    : task
+            );
+            saveTasks();
+            renderTasks();
+            updateTaskProgress();
+        }
+
+        function editTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+
+            document.getElementById('taskTitle').value = task.title;
+            document.getElementById('taskNotes').value = task.notes;
+
+            document.getElementById('taskSubmitBtn').textContent = '✓ Update Task';
+            document.getElementById('taskCancelBtn').style.display = 'block';
+
+            editingTaskId = id;
+            showSection('tasks');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteTask(id) {
+            if (confirm('Delete this task?')) {
+                tasks = tasks.filter(task => task.id !== id);
+                saveTasks();
+                renderTasks();
+                updateTaskProgress();
+            }
+        }
+
+        function renderTasks() {
+            const allTaskList = document.getElementById('taskList');
+            const activeTaskList = document.getElementById('activeTaskList');
+            const completedTaskList = document.getElementById('completedTaskList');
+
+            if (tasks.length === 0) {
+                const emptyMsg = '<div class="empty-state"><p>No tasks yet. Add your first task above!</p></div>';
+                allTaskList.innerHTML = emptyMsg;
+                activeTaskList.innerHTML = emptyMsg;
+                completedTaskList.innerHTML = emptyMsg;
+                return;
+            }
+
+            const renderTaskList = (taskList) => {
+                if (taskList.length === 0) return '<div class="empty-state"><p>No tasks in this category</p></div>';
+
+                return taskList.map(task => `
+                    <div class="task-item ${task.completed ? 'completed' : ''}">
+                        <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                        <div class="task-content">
+                            <div class="task-text">${escapeHtml(task.title)}</div>
+                            ${task.notes ? `<div class="task-notes">${escapeHtml(task.notes)}</div>` : ''}
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-secondary" onclick="editTask(${task.id})" style="padding: var(--space-8) var(--space-12); font-size: 12px;">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteTask(${task.id})">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            };
+
+            const activeTasks = tasks.filter(t => !t.completed);
+            const completedTasks = tasks.filter(t => t.completed);
+
+            allTaskList.innerHTML = renderTaskList(tasks);
+            activeTaskList.innerHTML = renderTaskList(activeTasks);
+            completedTaskList.innerHTML = renderTaskList(completedTasks);
+        }
+
+        function updateTaskProgress() {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            const percentage = total > 0 ? (completed / total) * 100 : 0;
+
+            document.getElementById('taskProgress').textContent = `${completed} / ${total}`;
+            document.getElementById('taskProgressBar').style.width = percentage + '%';
+
+            const progressBar = document.getElementById('taskProgressBar');
+            if (percentage === 100 && total > 0) {
+                progressBar.className = 'progress-fill success';
+            } else if (percentage >= 50) {
+                progressBar.className = 'progress-fill warning';
+            } else {
+                progressBar.className = 'progress-fill';
+            }
+        }
+
+        function switchTaskTab(tabName) {
+            document.querySelectorAll('#tasksSection .tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('#tasksSection .tab-button').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        initializeApp();
+    </script>
+</body>
+</html>
