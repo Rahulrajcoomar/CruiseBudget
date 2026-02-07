@@ -852,7 +852,7 @@
                 document.getElementById('cancelEditBtn').style.display = 'none';
             } else {
                 const newItem = {
-                    id: Date.now() + Math.random(),
+                    id: String(Date.now() + Math.random()),
                     name,
                     cost,
                     quantity,
