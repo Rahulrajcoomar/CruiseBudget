@@ -960,8 +960,9 @@
                             <td class="amount">R${(item.cost * item.quantity).toFixed(2)}</td>
                             <td>${badge}</td>
                             <td class="actions">
-                                <button class="btn btn-secondary" onclick="editBudgetItem(${item.id})" style="padding: var(--space-8) var(--space-12); font-size: 12px;">Edit</button>
-                                <button class="btn btn-danger" onclick="deleteBudgetItem(${item.id})">Delete</button>
+                                <button class="btn btn-secondary" onclick="editBudgetItem('${item.id}')" style="padding: var(--space-8) var(--space-12); font-size: 12px;">Edit</button>
+                                <button class="btn btn-danger" onclick="deleteBudgetItem('${item.id}')">Delete</button>
+
                             </td>
                         </tr>
                     `;
@@ -1249,8 +1250,8 @@
                             ${task.notes ? `<div class="task-notes">${escapeHtml(task.notes)}</div>` : ''}
                         </div>
                         <div class="task-actions">
-                            <button class="btn btn-secondary" onclick="editTask(${task.id})" style="padding: var(--space-8) var(--space-12); font-size: 12px;">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteTask(${task.id})">Delete</button>
+                            <button class="btn btn-secondary" onclick="editBudgetItem('${item.id}')" style="padding: var(--space-8) var(--space-12); font-size: 12px;">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteBudgetItem('${item.id}')">Delete</button>
                         </div>
                     </div>
                 `).join('');
