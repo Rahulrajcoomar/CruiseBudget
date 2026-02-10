@@ -852,7 +852,7 @@
                 document.getElementById('cancelEditBtn').style.display = 'none';
             } else {
                 const newItem = {
-                    id: String(Date.now() + Math.random()),
+                    id: 'b_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
                     name,
                     cost,
                     quantity,
@@ -1120,7 +1120,7 @@
 
                     if (name && cost > 0) {
                         newItems.push({
-                            id: Date.now() + Math.random(),
+                            id: 'b_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
                             name,
                             cost,
                             quantity,
@@ -1168,7 +1168,7 @@
                 document.getElementById('taskCancelBtn').style.display = 'none';
             } else {
                 const newTask = {
-                    id: Date.now() + Math.random(),
+                    id: 't_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
                     title,
                     notes,
                     completed: false,
