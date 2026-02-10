@@ -1169,13 +1169,13 @@
                 document.getElementById('taskCancelBtn').style.display = 'none';
             } else {
                 const newTask = {
-                    id: 't_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
-                    title,
-                    notes,
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                };
-                tasks.push(newTask);
+                id: 't_' + Date.now() + '_' + Math.floor(Math.random() * 100000),
+                title,
+                notes,
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+           tasks.push(newTask);
             }
 
             saveTasks();
