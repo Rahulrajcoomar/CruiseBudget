@@ -1244,14 +1244,14 @@
 
                 return taskList.map(task => `
                     <div class="task-item ${task.completed ? 'completed' : ''}">
-                        <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                        <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask('${task.id}')">
                         <div class="task-content">
                             <div class="task-text">${escapeHtml(task.title)}</div>
                             ${task.notes ? `<div class="task-notes">${escapeHtml(task.notes)}</div>` : ''}
                         </div>
                         <div class="task-actions">
-                            <button class="btn btn-secondary" onclick="editBudgetItem('${item.id}')" style="padding: var(--space-8) var(--space-12); font-size: 12px;">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteBudgetItem('${item.id}')">Delete</button>
+                            <button class="btn btn-secondary" onclick="editTask('${task.id}')" style="padding: var(--space-8) var(--space-12); font-size: 12px;">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteTask('${task.id}')">Delete</button>
                         </div>
                     </div>
                 `).join('');
